@@ -15,7 +15,6 @@ class Person
 
   private
 
-
   def of_age?
     @age >= 18
   end
