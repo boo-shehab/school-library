@@ -9,7 +9,7 @@ class Student < Person
     '¯\\(ツ)/¯'
   end
 
-  def add_calssrom(classroom)
+  def add_classrom(classroom)
     @classroom = classroom
     classroom.students.push(self) unless classroom.students.include?(self)
   end
