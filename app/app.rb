@@ -7,7 +7,6 @@ require_relative 'teacher'
 require 'date'
 
 class App
-
   def initialize
     @books = []
     @people = []
