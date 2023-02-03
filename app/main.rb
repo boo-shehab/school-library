@@ -1,4 +1,3 @@
-#!/usr/bin/env ruby
 require_relative 'app'
 require_relative 'book'
 require_relative 'class_room'
