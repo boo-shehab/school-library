@@ -1,4 +1,4 @@
-#!C:/Ruby25-x64/bin/ruby.exe
+#!/usr/bin/env ruby
 require_relative 'app'
 require_relative 'book'
 require_relative 'class_room'
