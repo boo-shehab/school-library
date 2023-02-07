@@ -10,7 +10,6 @@ class App
   def initialize
     @books = []
     @people = []
-
     puts "Welcome to School Library App!\n\n"
   end
 
