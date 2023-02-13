@@ -6,6 +6,7 @@ require_relative 'rental'
 require_relative 'teacher'
 
 @lib = App.new
+
 def main
   loop do
     puts main_section
