@@ -41,9 +41,7 @@ def run_available_options(choice)
   when 5
     @lib.add_rental
   when 6
-    @lib.list_rentals
-  else
-    puts ''
+    @lib.list_rentalsg
   end
 end
 main
