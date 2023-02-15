@@ -11,10 +11,9 @@ require 'date'
 require 'json'
 
 class App
-
   def initialize
-    @books = GetData.new.get_books
-    @people = GetData.new.get_people
+    @books = GetData.new.list_of_books
+    @people = GetData.new.list_of_people
 
     GetData.new.get_rentals(@books, @people)
 
@@ -26,9 +25,9 @@ class App
                              'Please enter a valid number!')
     case person_type
     when 1
-      @people << add_student
+      add_student
     when 2
-      @people << add_teacher
+      add_teacher
     else
       puts ''
     end
@@ -42,8 +41,8 @@ class App
     return unless student
 
     AddData.new.add_person(student)
+    @people << student
     puts "Student #{name} is added!\n\n"
-    student
   end
 
   def add_teacher
@@ -54,8 +53,8 @@ class App
     return unless teacher
 
     AddData.new.add_person(teacher)
+    @people << teacher
     puts "Teacher #{name} is added!\n\n"
-    teacher
   end
 
   def add_book
@@ -69,7 +68,7 @@ class App
     puts "Book #{title} is created successfully!\n\n"
   end
 
-  def list_books( with_id: false)
+  def list_books(with_id: false)
     if with_id
       @books.each_with_index { |book, idx| puts "#{idx}) Title: #{book.title}, Author: #{book.author}" }
     else
@@ -82,7 +81,7 @@ class App
     puts ''
   end
 
-  def list_people( with_id: false)
+  def list_people(with_id: false)
     if with_id
       @people.each_with_index do |person, idx|
         puts "#{idx}) [#{person.class}] ID: #{person.id}, Name: #{person.name}, Age: #{person.age}"
@@ -104,23 +103,21 @@ class App
     end
 
     puts 'Select a book from the following list:'
-    list_books( with_id: true)
+    list_books(with_id: true)
     book_idx = get_number('Book: ', 'Please enter a valid number!')
 
     puts 'Select a person from the following list:'
-    list_people( with_id: true)
+    list_people(with_id: true)
     person_idx = get_number('Borrower: ', 'Please enter a valid number!')
     date = get_date('Date: ', 'Please enter a valid date!')
 
     begin
-      person = @people.at(person_idx)
-      book = @books.at(book_idx)
-      Rental.new(date, book, person)
+      Rental.new(date, @books.at(book_idx), @people.at(person_idx))
     rescue NoMethodError
       puts "Book or person not found. Please try again!\n\n"
       return add_rental
     end
-    AddData.new.add_rentals(date, book.title, person.name)
+    AddData.new.add_rentals(date, @books.at(book_idx).title, @people.at(person_idx).name)
     puts "Rental Added!\n\n"
   end
 
