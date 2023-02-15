@@ -1,8 +1,8 @@
 class AddData
   def add_book(book)
-    File.open('books.json') do |book_add|
+    File.open('books.json') do
       new_book = { title: book.title, author: book.author }
-      if book_add == ''
+      if File.read('books.json') == ''
         data = [new_book]
       else
         data = JSON.parse(File.read('books.json'))
@@ -13,16 +13,14 @@ class AddData
   end
 
   def add_person(person)
-    File.open('people.json') do |person_add|
-      obj = person_type(person)
-      if person_add == ''
-        list = [obj]
-      else
-        list = JSON.parse(File.read('people.json'))
-        list << obj unless list.include? obj
-      end
-      File.write('people.json', JSON.generate(list))
+    obj = person_type(person)
+    if File.read('people.json') == ''
+      list = [obj]
+    else
+      list = JSON.parse(File.read('people.json'))
+      list << obj unless list.include? obj
     end
+    File.write('people.json', JSON.generate(list))
   end
 
   def person_type(person)
@@ -47,14 +45,14 @@ class AddData
   end
 
   def add_rentals(date, book_title, person_name)
-    File.open('rentals.json') do |rental_add|
+    File.open('rentals.json') do
       rental = {
         date: date,
         book_title: book_title,
         person: person_name
       }
 
-      if rental_add == ''
+      if File.read('rentals.json') == ''
         data = [rental]
       else
         data = JSON.parse(File.read('rentals.json'))
