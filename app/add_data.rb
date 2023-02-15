@@ -2,7 +2,7 @@ class AddData
   def add_book(book)
     File.open('books.json') do |book_add|
       new_book = { title: book.title, author: book.author }
-      if book_add.size.zero?
+      if book_add == ''
         data = [new_book]
       else
         data = JSON.parse(File.read('books.json'))
@@ -15,7 +15,7 @@ class AddData
   def add_person(person)
     File.open('people.json') do |person_add|
       obj = person_type(person)
-      if person_add.size.zero?
+      if person_add == ''
         list = [obj]
       else
         list = JSON.parse(File.read('people.json'))
@@ -54,7 +54,7 @@ class AddData
         person: person_name
       }
 
-      if rental_add.size.zero?
+      if rental_add == ''
         data = [rental]
       else
         data = JSON.parse(File.read('rentals.json'))
