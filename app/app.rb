@@ -4,55 +4,20 @@ require_relative 'class_room'
 require_relative 'student'
 require_relative 'rental'
 require_relative 'teacher'
+require_relative 'get_data'
+require_relative 'add_data'
 require 'date'
+
+require 'json'
 
 class App
   def initialize
-    @books = []
-    @people = []
+    @books = GetData.new.list_of_books
+    @people = GetData.new.list_of_people
+
+    GetData.new.get_rentals(@books, @people)
+
     puts "Welcome to School Library App!\n\n"
-  end
-
-  def run
-    loop do
-      puts main_section
-      choice = get_number('', 'Please enter a valid number!')
-      return if choice == 7
-
-      run_available_options(choice)
-    end
-  end
-
-  private
-
-  def run_available_options(choice)
-    case choice
-    when 1
-      list_books(@books)
-    when 2
-      list_people(@people)
-    when 3
-      add_person
-    when 4
-      @books << add_book
-    when 5
-      add_rental(@books, @people)
-    when 6
-      list_rentals(@people)
-    else
-      puts ''
-    end
-  end
-
-  def main_section
-    'Please choose an option by entering a number:
-  1 - List all books
-  2 - List all people
-  3 - Create a person
-  4 - Create a book
-  5 - Create a rental
-  6 - List all rentals for a given person
-  7 - Exit'
   end
 
   def add_person
@@ -60,9 +25,9 @@ class App
                              'Please enter a valid number!')
     case person_type
     when 1
-      @people << add_student
+      add_student
     when 2
-      @people << add_teacher
+      add_teacher
     else
       puts ''
     end
@@ -75,8 +40,9 @@ class App
     student = Student.new(age, name, parent_permission: permission)
     return unless student
 
+    AddData.new.add_person(student)
+    @people << student
     puts "Student #{name} is added!\n\n"
-    student
   end
 
   def add_teacher
@@ -86,8 +52,9 @@ class App
     teacher = Teacher.new(specialization, age, name)
     return unless teacher
 
+    AddData.new.add_person(teacher)
+    @people << teacher
     puts "Teacher #{name} is added!\n\n"
-    teacher
   end
 
   def add_book
@@ -96,74 +63,74 @@ class App
     book = Book.new(title, author)
     return unless book
 
+    AddData.new.add_book(book)
+    @books << book
     puts "Book #{title} is created successfully!\n\n"
-    book
   end
 
-  def list_books(books, with_id: false)
+  def list_books(with_id: false)
     if with_id
-      books.each_with_index { |book, idx| puts "#{idx}) Title: #{book.title}, Author: #{book.author}" }
+      @books.each_with_index { |book, idx| puts "#{idx}) Title: #{book.title}, Author: #{book.author}" }
     else
-      if books.empty?
+      if @books.empty?
         puts "No books added yet\n\n"
         return
       end
-      books.each { |book| puts "Title: #{book.title}, Author: #{book.author}" }
+      @books.each { |book| puts "Title: #{book.title}, Author: #{book.author}" }
     end
     puts ''
   end
 
-  def list_people(people, with_id: false)
+  def list_people(with_id: false)
     if with_id
-      people.each_with_index do |person, idx|
+      @people.each_with_index do |person, idx|
         puts "#{idx}) [#{person.class}] ID: #{person.id}, Name: #{person.name}, Age: #{person.age}"
       end
     else
-      if people.empty?
+      if @people.empty?
         puts "No person created yet\n\n"
         return
       end
-      people.each { |person| puts "[#{person.class}] ID: #{person.id}, Name: #{person.name}, Age: #{person.age}" }
+      @people.each { |person| puts "[#{person.class}] ID: #{person.id}, Name: #{person.name}, Age: #{person.age}" }
     end
     puts ''
   end
 
-  def add_rental(books, people)
-    if people.empty? || books.empty?
+  def add_rental()
+    if @people.empty? || @books.empty?
       puts "Either People or book List is empty. Please populate these lists in order to check rentals\n\n"
       return
     end
 
     puts 'Select a book from the following list:'
-    list_books(books, with_id: true)
+    list_books(with_id: true)
     book_idx = get_number('Book: ', 'Please enter a valid number!')
 
     puts 'Select a person from the following list:'
-    list_people(people, with_id: true)
+    list_people(with_id: true)
     person_idx = get_number('Borrower: ', 'Please enter a valid number!')
     date = get_date('Date: ', 'Please enter a valid date!')
 
     begin
-      person = people.at(person_idx)
-      book = books.at(book_idx)
-      Rental.new(date, book, person)
+      Rental.new(date, @books.at(book_idx), @people.at(person_idx))
     rescue NoMethodError
       puts "Book or person not found. Please try again!\n\n"
-      return add_rental(books, people)
+      return add_rental
     end
+    AddData.new.add_rentals(date, @books.at(book_idx).title, @people.at(person_idx).name)
     puts "Rental Added!\n\n"
   end
 
-  def list_rentals(people)
-    if people.empty?
+  def list_rentals
+    if @people.empty?
       puts "People List is empty. Please add people in order to check their rentals\n\n"
       return
     end
     puts 'Select a person ID from the following list:'
-    list_people(people)
+    list_people
 
     person_id = get_number('Person ID: ', 'Please enter a valid number!')
-    person = people.find { |current_person| current_person.id == person_id }
+    person = @people.find { |current_person| current_person.id == person_id }
     if person.nil?
       puts "Person with ID: #{person_id} not found!\n\n"
       return list_rentals(people)
